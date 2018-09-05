@@ -20,10 +20,15 @@ import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 class IconmainService {
+
+    static def priceList = [10.1, 6, 7.5, 12.3, 9.12, 8.4, 8.2, 14.2, 6.9, 11.3, 4]
+    static def tokenidPriceMap = [:]
+
+
     def iconService;
 
     def load() {
-        final String URL = "http://192.168.1.9:9000/api/v3";
+        final String URL = "http://localhost:9000/api/v3";
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -114,8 +119,11 @@ class IconmainService {
         def tokenList = []
         JSONObject obj = new JSONObject(result.asString());
         JSONArray idolTokensOfOwner = obj.getJSONArray("idols");
+        int index=0;
         for (Object idolToken : idolTokensOfOwner) {
-            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString()).put("tokenId", idolToken.toString()))
+            System.out.println("index being passed is : " + index)
+            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString(),index).put("tokenId", idolToken.toString()))
+            index= index+1;
         }
         tokenList
     }
@@ -124,7 +132,7 @@ class IconmainService {
         getAllTokensOf(currentWallet.getAddress().toString(), scoreAddressStr)
     }
 
-    def getTokenInfo(String address, String scoreAddressStr, String tokenId) throws IOException {
+    def getTokenInfo(String address, String scoreAddressStr, String tokenId, int index =0) throws IOException {
         Address firstAddress = new Address(address)
 
         RpcObject params = new RpcObject.Builder()
@@ -139,7 +147,18 @@ class IconmainService {
                 .build();
 
         RpcItem result = iconService.call(call).execute();
-        new JSONObject(result.asString())
+
+        def jsonObj = new JSONObject(result.asString())
+        def price = tokenidPriceMap.containsKey(tokenId)? tokenidPriceMap.get(tokenId) : priceList.get(index)
+        if(!tokenidPriceMap.containsKey(tokenId)) {
+            tokenidPriceMap.put(tokenId, priceList.get(index))
+        }
+
+        System.out.println("tokenidPriceMap.get(tokenId) for id :" + tokenId + "  - " + tokenidPriceMap.get(tokenId) + " price :" + price);
+
+        jsonObj = jsonObj.accumulate("price", price)
+        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString());
+        jsonObj;
 //        System.out.println(firstAddress.toString() + " :result:" + result.asString());
 //        ibiz.icon.idoltoken.api.Idol idol = new Gson().fromJson(result.asString(), ibiz.icon.idoltoken.api.Idol.class);
 //        return String.format("Address (%s) => Name: %s Age: %d Gender: %s ", firstAddress.toString(), idol.getName(),
@@ -147,6 +166,7 @@ class IconmainService {
     }
 
     def getTokenInfo(KeyWallet currentWallet, String scoreAddressStr, String tokenId) throws IOException {
+
         getTokenInfo(currentWallet.getAddress().toString(), scoreAddressStr, tokenId)
     }
 
