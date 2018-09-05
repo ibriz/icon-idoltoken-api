@@ -25,8 +25,8 @@ class IconmainController {
     }
 
     def index(params) {
-//        redirect(action: "checkAccountPage", params: params)
-        render(["TEST": "test"] as JSONObject)
+        redirect(action: "checkAccountPage", params: params)
+//        render(["TEST": "test"] as JSONObject)
     }
 
     def myWallet(params) {
@@ -194,7 +194,7 @@ class IconmainController {
 
         try {
             byte[] bytes = fileByte.getBytes();
-            File file = new File("upload\\" + fileByte.getOriginalFilename());
+            File file = new File("upload" + File.separator + fileByte.getOriginalFilename());
 
             OutputStream os = new FileOutputStream(file);
             os.write(bytes);
