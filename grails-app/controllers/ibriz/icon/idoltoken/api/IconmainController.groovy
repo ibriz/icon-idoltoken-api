@@ -194,18 +194,11 @@ class IconmainController {
 
         try {
             byte[] bytes = fileByte.getBytes();
-            File file = new File("upload" + File.separator + fileByte.getOriginalFilename());
-
-            OutputStream os = new FileOutputStream(file);
-            os.write(bytes);
-            System.out.println("Write bytes to file.");
-            os.close();
 
             IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
-            NamedStreamable.FileWrapper fileWrapper = new NamedStreamable.FileWrapper(file);
-            MerkleNode addResult = ipfs.add(fileWrapper).get(0);
 
-
+            NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper(bytes);
+            MerkleNode addResult = ipfs.add(file).get(0);
             def result = addResult.toJSON();
             print("result: : " + result)
 

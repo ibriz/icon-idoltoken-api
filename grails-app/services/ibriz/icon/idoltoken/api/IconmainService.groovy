@@ -121,7 +121,6 @@ class IconmainService {
         JSONArray idolTokensOfOwner = obj.getJSONArray("idols");
         int index=0;
         for (Object idolToken : idolTokensOfOwner) {
-//            System.out.println("index being passed is : " + index)
             tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString(),index).put("tokenId", idolToken.toString()))
             index= index+1;
         }
@@ -157,10 +156,17 @@ class IconmainService {
 //        System.out.println("tokenidPriceMap.get(tokenId) for id :" + tokenId + "  - " + tokenidPriceMap.get(tokenId) + " price :" + price);
 
         jsonObj = jsonObj.accumulate("price", price)
-        jsonObj.put("age", Integer.parseInt(jsonObj.get("age")?.toString()?.substring(2), 16))
-//        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString());
+        if(jsonObj.get("age") != null) {
+            if(jsonObj.get("age").toString().startsWith('0x')) {
+                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString().substring(2), 16))
+            }
+            else{
+                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString()))
+            }
+        }
+
+        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString());
         jsonObj;
-//        System.out.println(firstAddress.toString() + " :result:" + result.asString());
     }
 
     def getTokenInfo(KeyWallet currentWallet, String scoreAddressStr, String tokenId) throws IOException {
