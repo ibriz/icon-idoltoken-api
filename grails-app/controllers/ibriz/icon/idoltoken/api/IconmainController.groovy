@@ -183,7 +183,8 @@ class IconmainController {
                 age         : tokenInfo.age,
                 gender      : tokenInfo.gender,
                 price       : tokenInfo?.price,
-                ipfs_handle : tokenInfo.ipfs_handle
+                ipfs_handle : tokenInfo.ipfs_handle,
+                tokenId: params.tokenId
         ] as JSONObject)
     }
 
