@@ -194,17 +194,10 @@ class IconmainController {
 
         try {
             byte[] bytes = fileByte.getBytes();
-            File file = new File("upload" + File.separator + fileByte.getOriginalFilename());
-
-            OutputStream os = new FileOutputStream(file);
-            os.write(bytes);
-            System.out.println("Write bytes to file.");
-            os.close();
 
             IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
-            NamedStreamable.FileWrapper fileWrapper = new NamedStreamable.FileWrapper(file);
-            MerkleNode addResult = ipfs.add(fileWrapper).get(0);
-
+            NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper(bytes);
+            MerkleNode addResult = ipfs.add(file).get(0);
 
             def result = addResult.toJSON();
             print("result: : " + result)
@@ -219,11 +212,9 @@ class IconmainController {
     def showImage(params) {
         IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
         Multihash filePointer = Multihash.fromBase58(params.hash);
-        byte[] fileContents = Base64.encodeBase64(ipfs.cat(filePointer));
-
-        BASE64Encoder encoder = new BASE64Encoder();
-
-        def response = [fileContentType: "image/png", fileByte: encoder.encode(fileContents), ipfsHash: params.hash]
+        byte[] fileContents = ipfs.cat(filePointer);
+        String encodedfile = new String(Base64.encodeBase64(fileContents), "UTF-8");
+        def response = [fileContentType: "image/png", fileByte: encodedfile, ipfsHash: params.hash]
         render(response as JSONObject)
     }
 }

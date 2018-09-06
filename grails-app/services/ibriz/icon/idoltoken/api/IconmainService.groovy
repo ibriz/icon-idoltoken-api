@@ -1,11 +1,6 @@
 package ibriz.icon.idoltoken.api
 
-import foundation.icon.icx.Call
-import foundation.icon.icx.IconService
-import foundation.icon.icx.KeyWallet
-import foundation.icon.icx.SignedTransaction
-import foundation.icon.icx.Transaction
-import foundation.icon.icx.TransactionBuilder
+import foundation.icon.icx.*
 import foundation.icon.icx.data.Address
 import foundation.icon.icx.data.Bytes
 import foundation.icon.icx.transport.http.HttpProvider
@@ -28,7 +23,7 @@ class IconmainService {
     def iconService;
 
     def load() {
-        final String URL = "http://localhost:9000/api/v3";
+        final String URL = "http://192.168.233.131:9000/api/v3";
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -119,11 +114,10 @@ class IconmainService {
         def tokenList = []
         JSONObject obj = new JSONObject(result.asString());
         JSONArray idolTokensOfOwner = obj.getJSONArray("idols");
-        int index=0;
+        int index = 0;
         for (Object idolToken : idolTokensOfOwner) {
-//            System.out.println("index being passed is : " + index)
-            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString(),index).put("tokenId", idolToken.toString()))
-            index= index+1;
+            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString(), index).put("tokenId", idolToken.toString()))
+            index = index + 1;
         }
         tokenList
     }
@@ -132,7 +126,7 @@ class IconmainService {
         getAllTokensOf(currentWallet.getAddress().toString(), scoreAddressStr)
     }
 
-    def getTokenInfo(String address, String scoreAddressStr, String tokenId, int index =0) throws IOException {
+    def getTokenInfo(String address, String scoreAddressStr, String tokenId, int index = 0) throws IOException {
         Address firstAddress = new Address(address)
 
         RpcObject params = new RpcObject.Builder()
@@ -149,18 +143,24 @@ class IconmainService {
         RpcItem result = iconService.call(call).execute();
 
         def jsonObj = new JSONObject(result.asString())
-        def price = tokenidPriceMap.containsKey(tokenId)? tokenidPriceMap.get(tokenId) : priceList.get(index)
-        if(!tokenidPriceMap.containsKey(tokenId)) {
+        def price = tokenidPriceMap.containsKey(tokenId) ? tokenidPriceMap.get(tokenId) : priceList.get(index)
+        if (!tokenidPriceMap.containsKey(tokenId)) {
             tokenidPriceMap.put(tokenId, priceList.get(index))
         }
 
 //        System.out.println("tokenidPriceMap.get(tokenId) for id :" + tokenId + "  - " + tokenidPriceMap.get(tokenId) + " price :" + price);
 
         jsonObj = jsonObj.accumulate("price", price)
-        jsonObj.put("age", Integer.parseInt(jsonObj.get("age")?.toString()?.substring(2), 16))
-//        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString());
-        jsonObj;
-//        System.out.println(firstAddress.toString() + " :result:" + result.asString());
+        if (jsonObj.get("age") != null) {
+            if (jsonObj.get("age").toString().startsWith('0x')) {
+                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString().substring(2), 16))
+            } else {
+                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString()))
+            }
+        }
+
+        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString())
+        jsonObj
     }
 
     def getTokenInfo(KeyWallet currentWallet, String scoreAddressStr, String tokenId) throws IOException {
