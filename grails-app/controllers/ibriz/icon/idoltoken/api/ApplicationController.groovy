@@ -11,10 +11,6 @@ class ApplicationController implements PluginManagerAware {
     GrailsPluginManager pluginManager
 
     def index() {
-        println "TTTTTTTTTT"
         [grailsApplication: grailsApplication, pluginManager: pluginManager]
-    }
-    def test(){
-        render([test: "TESTSETSETSETS"] as JSONObject)
     }
 }

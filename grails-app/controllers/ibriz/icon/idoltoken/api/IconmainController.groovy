@@ -12,30 +12,35 @@ import org.grails.web.json.JSONObject
 import sun.misc.BASE64Encoder
 
 class IconmainController {
-    static responseFormats = ['json', 'xml']
-    public final String URL = "http://192.168.1.9:9000/api/v3";
+    static responseFormats = ['json']
 
     def iconmainService
+
+    def defaultAccountAddress = "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
+    def defaultSCORE = "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0"
+    def defaultToken = "IDOL"
 
     Map<String, String> scoreMap = new HashMap<String, String>() {
         {
 //            put("MNT", "cxb8f2c9ba48856df2e889d1ee30ff6d2e002651cf")
-            put("IDOL", "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+            put("IDOL", "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0")
         }
     }
 
     def index(params) {
         redirect(action: "checkAccountPage", params: params)
-//        render(["TEST": "test"] as JSONObject)
     }
 
     def myWallet(params) {
-        params.address = "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
-        String scoreAddress = scoreMap.getOrDefault(params.tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        params.address = defaultAccountAddress
+        String scoreAddress = scoreMap.getOrDefault(params.tokenType, defaultSCORE)
 
         checkAccountPage(params)
         render([
-                address: params.address, tokenType: 'MNT', scoreMap: scoreMap, scoreAddress: scoreAddress
+                address     : params.address,
+                tokenType   : 'MNT',
+                scoreMap    : scoreMap,
+                scoreAddress: scoreAddress
         ] as JSONObject)
     }
 
@@ -47,7 +52,11 @@ class IconmainController {
         def currentAddress = params.address
         def tokenType = params.tokenType
 
-        [address: currentAddress, scoreMap: scoreMap, tokenType: tokenType]
+        [
+                address  : currentAddress,
+                scoreMap : scoreMap,
+                tokenType: tokenType
+        ]
     }
 
     def transferIdolToken() {
@@ -58,9 +67,8 @@ class IconmainController {
     }
 
     def transfer(params) {
-        println "params = $params"
         def currentAddress = params.fromAddress
-        def scoreAddress = scoreMap.getOrDefault(params.tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        def scoreAddress = scoreMap.getOrDefault(params.tokenType, defaultSCORE)
         def toAddress = params.toAddress
         String transferAmount = params.tokenAmount
         String tokenId = params?.tokenId
@@ -72,7 +80,6 @@ class IconmainController {
         if (params.tokenType == 'IDOL') {
             def approvalTransactionHash = iconmainService.approveTransaction(currentWallet, scoreAddress, toAddress, tokenId)
             transactionHash = iconmainService.sendTransaction(currentWallet, scoreAddress, toAddress, tokenId)
-//            tokens = iconmainService.getAllTokensOf(currentWallet, scoreAddress)
         } else
             transactionHash = iconmainService.transfer(currentWallet, scoreAddress, currentWallet.getAddress(), toAddress, transferAmount)
         def remainingBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress)
@@ -94,25 +101,35 @@ class IconmainController {
     }
 
     def checkAccount() {
-        def currentAddress = params.address ? params.address : "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
-        String tokenType = params.tokenType ? params.tokenType : "IDOL"
-        String scoreAddress = scoreMap.getOrDefault(tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        def currentAddress = params.address ? params.address : defaultAccountAddress
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
+        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
 
-        [address: currentAddress, scoreMap: scoreMap, tokenType: tokenType, scoreAddress: scoreAddress]
+        [
+                address     : currentAddress,
+                scoreMap    : scoreMap,
+                tokenType   : tokenType,
+                scoreAddress: scoreAddress
+        ]
     }
 
     def createToken() {
-        def ownerAddress = params.address ? params.address : "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
-        String tokenType = params.tokenType ? params.tokenType : "IDOL"
-        String scoreAddress = scoreMap.getOrDefault(tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
-        [address: ownerAddress, tokenType: tokenType, scoreAddress: scoreAddress, scoreMap: scoreMap]
+        def ownerAddress = params.address ? params.address : defaultAccountAddress
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
+        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
+        [
+                address     : ownerAddress,
+                tokenType   : tokenType,
+                scoreAddress: scoreAddress,
+                scoreMap    : scoreMap
+        ]
     }
 
     def createIdolToken(params) {
 
-        def address = params.address ? params.address : "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
-        String tokenType = params.tokenType ? params.tokenType : "IDOL"
-        String scoreAddress = scoreMap.getOrDefault(tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        def address = params.address ? params.address : defaultAccountAddress
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
+        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
 
         KeyWallet currentWallet = IconConfiguration.getWalletByAddress(address)
 
@@ -123,24 +140,26 @@ class IconmainController {
 
         def createTokenTransaction = iconmainService.createTokenTransaction(currentWallet, scoreAddress,
                 new Idol(fullname, age as BigInteger, gender, ipfs_handle))
-        println "createTokenTransaction = $createTokenTransaction"
-        render([
-                address     : address,
-                scoreAddress: scoreAddress,
-                tokenType   : tokenType,
-                fullname    : fullname,
-                age         : age,
-                gender      : gender,
-                ipfs_handle : ipfs_handle,
-                txHash      : createTokenTransaction
-        ] as JSONObject)
+
+        render(
+                [
+                        address     : address,
+                        scoreAddress: scoreAddress,
+                        tokenType   : tokenType,
+                        fullname    : fullname,
+                        age         : age,
+                        gender      : gender,
+                        ipfs_handle : ipfs_handle,
+                        txHash      : createTokenTransaction
+                ] as JSONObject)
     }
+
     // TODO disabled the need of keystore right now,
     // changse will require the need of keystore for the entered address to see the account page
     def checkAccountPage(params) {
-        def currentAddress = params.address ? params.address : "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
-        String tokenType = params.tokenType ? params.tokenType : "IDOL"
-        String scoreAddress = scoreMap.getOrDefault(tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        def currentAddress = params.address ? params.address : defaultAccountAddress
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
+        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
         def icxbalance = iconmainService.balanceOfICX(currentAddress)
         def tokenBalance = null
         println "tokenBalance = " + IconConfiguration.listOfAccounts()
@@ -149,43 +168,50 @@ class IconmainController {
             KeyWallet currentWallet = IconConfiguration.getWalletByAddress(currentAddress)
             tokenBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress)
 
-            if (tokenType == "IDOL") {
+            if (tokenType == defaultToken) {
                 tokens = iconmainService.getAllTokensOf(currentWallet, scoreAddress)
             }
         } catch (Exception ex) {
             ex.printStackTrace()
             println "Invalid Keystore Error:" + ex.toString()
             tokenBalance = iconmainService.getTokenBalance(currentAddress, scoreAddress)
-            if (tokenType == "IDOL") {
+            if (tokenType == defaultToken) {
                 tokens = iconmainService.getAllTokensOf(currentAddress, scoreAddress)
             }
         }
 
         def response = [
-                address  : currentAddress, tokenType: tokenType, tokenBalance: tokenBalance, ICXbalance: icxbalance, scoreAddress: scoreAddress, scoreMap: scoreMap,
-                tokenList: tokens, accountList: IconConfiguration.listOfAccounts()
+                address     : currentAddress,
+                tokenType   : tokenType,
+                tokenBalance: tokenBalance,
+                ICXbalance  : icxbalance,
+                scoreAddress: scoreAddress,
+                scoreMap    : scoreMap,
+                tokenList   : tokens,
+                accountList : IconConfiguration.listOfAccounts()
         ]
         render(response as JSONObject)
     }
 
     def checkTokenDetails(params) {
-        String currentAddress = params.address ? params.address : "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
+        String currentAddress = params.address ? params.address : defaultAccountAddress
         String tokenId = params.tokenId ? params.tokenId : ""
-        String tokenType = params.tokenType ? params.tokenType : "IDOL"
-        String scoreAddress = scoreMap.getOrDefault(tokenType, "cx0bce5bfe899c4beec7ea93f2000e16351191017e")
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
+        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
         def tokenInfo = iconmainService.getTokenInfo(currentAddress, scoreAddress, tokenId)
-        render([
-                address     : tokenInfo.owner,
-                tokenType   : tokenType,
-                scoreAddress: scoreAddress,
-                scoreMap    : scoreMap,
-                name        : tokenInfo.name,
-                age         : tokenInfo.age,
-                gender      : tokenInfo.gender,
-                price       : tokenInfo?.price,
-                ipfs_handle : tokenInfo.ipfs_handle,
-                tokenId: params.tokenId
-        ] as JSONObject)
+        render(
+                [
+                        address     : tokenInfo.owner,
+                        tokenType   : tokenType,
+                        scoreAddress: scoreAddress,
+                        scoreMap    : scoreMap,
+                        name        : tokenInfo.name,
+                        age         : tokenInfo.age,
+                        gender      : tokenInfo.gender,
+                        price       : tokenInfo?.price,
+                        ipfs_handle : tokenInfo.ipfs_handle,
+                        tokenId     : params.tokenId
+                ] as JSONObject)
     }
 
 

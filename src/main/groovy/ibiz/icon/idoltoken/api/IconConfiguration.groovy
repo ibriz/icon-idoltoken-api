@@ -6,7 +6,7 @@ public class IconConfiguration {
     public static Map<String, KeyWallet> walletMap = new HashMap<>();
 
     public static final BigInteger NETWORK_ID = new BigInteger("3");
-    public static final BigInteger STEP_LIMIT = new BigInteger("10000");
+    public static final BigInteger STEP_LIMIT = new BigInteger("2013265920");
     public static final BigInteger NOUNCE = new BigInteger("10000");
 
     public static Boolean hasAddress(String address) {
