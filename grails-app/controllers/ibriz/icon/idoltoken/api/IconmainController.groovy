@@ -9,7 +9,6 @@ import io.ipfs.api.NamedStreamable
 import io.ipfs.multihash.Multihash
 import org.apache.commons.codec.binary.Base64
 import org.grails.web.json.JSONObject
-import sun.misc.BASE64Encoder
 
 class IconmainController {
     static responseFormats = ['json']
@@ -22,8 +21,7 @@ class IconmainController {
 
     Map<String, String> scoreMap = new HashMap<String, String>() {
         {
-//            put("MNT", "cxb8f2c9ba48856df2e889d1ee30ff6d2e002651cf")
-            put("IDOL", "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0")
+            put("IDOL", "cx2786071ed73dd62de1a2ef5e514f7253cd8389af")
         }
     }
 
