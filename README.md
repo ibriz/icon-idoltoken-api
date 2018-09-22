@@ -16,6 +16,8 @@ $ tbears deploy -t tbears idol_token -f hx65f6e18d378b57612a28f72acb97021eaa82aa
 - Grails 3.3
 - Gradle 4.x
 - JAVA 8
+- tbears 1.0.5.1
+- IPFS daemon
 
 ### Steps
 We will be using Intellij to open the project in.
@@ -25,7 +27,7 @@ We will be using Intellij to open the project in.
 - Dependencies for the project will be downloaed from build.gradle setup automatically
 
 # API Documentation
-### 1. Check profile of an Account
+### 1.  Check profile of an Account
 > http://localhost:8080/iconmain/checkAccountPage?address=hx65f6e18d378b57612a28f72acb97021eaa82aa5a&tokenType=IDOL
 
 #### Parameters
@@ -34,7 +36,6 @@ We will be using Intellij to open the project in.
 | ------ | ------ |
 | `address` | hx65f6e18d378b57612a28f72acb97021eaa82aa5a |
 | `tokenType` | IDOL |
-
 
 #### Example Request to retrieve profile information of Account A
 Check profile of Account A
@@ -73,7 +74,7 @@ curl --request GET \
 ### 2.  Token Details
 > http://localhost:8080/iconmain/checkTokenDetails?tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e
 
-#### PARAMS
+#### Parameters
 
 | Key | Value |
 | ------ | ------ |
@@ -87,7 +88,7 @@ curl --request GET \
   --url 'http://localhost:8080/iconmain/checkTokenDetails?tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e'
 ```
 
-#### Response:
+#### Response
 ```json
 {
   "address": "hx40ebd13225ed28f7e98be3cd833ebe555cba72ca",
@@ -101,10 +102,10 @@ curl --request GET \
 }
 ```
 
-### 3. Create new Token
+### 3.  Create new Token
 > http://localhost:8080/iconmain/createIdolToken?address=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&name=Jennifer%20Aniston&age=40&gender=F&ipfs_handle=0xsfalsdfjlk2
 
-#### PARAMS
+#### Parameters
 | Key | Value |
 | ------ | ------ |
 | `address` | hx40ebd13225ed28f7e98be3cd833ebe555cba72ca |
@@ -119,7 +120,7 @@ curl --request GET \
   --url 'http://localhost:8080/iconmain/createIdolToken?address=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&name="Jennifer Aniston"&age=40&gender=F&ipfs_handle=0xsfalsdfjlk2'
 ```
 
-#### Response:
+#### Response
 ```json
 {
     "address": "hx40ebd13225ed28f7e98be3cd833ebe555cba72ca",
@@ -136,7 +137,7 @@ curl --request GET \
 ### 4.  Transfer token
 > http://localhost:8080/iconmain/transfer?fromAddress=hx65f6e18d378b57612a28f72acb97021eaa82aa5a&toAddress=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e
 
-#### PARAMS
+#### Parameters
 | Key | Value |
 | ------ | ------ |
 | `fromAddress` | hx65f6e18d378b57612a28f72acb97021eaa82aa5a |
@@ -150,7 +151,7 @@ curl --request GET \
   --url 'http://localhost:8080/iconmain/transfer?fromAddress=hx65f6e18d378b57612a28f72acb97021eaa82aa5a&toAddress=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e'
  ```
 
-#### Response:
+#### Response
 ```json
 {
   "address": "hx65f6e18d378b57612a28f72acb97021eaa82aa5a",
@@ -168,7 +169,54 @@ curl --request GET \
 }
 ```
 
+### 5.  Upload Image
+> http://localhost:8080/iconmain/uploadImage
+
+#### Parameters
+| Key | Value |
+| ------ | ------ |
+| images | <bytes file> |
+
+#### Example Request
+```sh
+curl -X POST \
+  http://localhost:8081/iconmain/uploadImage \
+  -H 'content-type: multipart/form-data;' \
+  -F 'image=@C:\Users\user\Pictures\image.png'
+```
+#### Response
+```json
+{
+    "ipfsHash": "QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR",
+    "name": "QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR",
+    "size": "10490"
+}
+```
+
+
+### 6.  Read Image
+> http://localhost:8080/iconmain/showImage?hash=QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR
+
+#### Parameters
+| Key | Value |
+| ------ | ------ |
+| ipfsHash | QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR |
+| fileByte |  iVBORw0KG... |
+| fileContentType | image/png |
+#### Example Request
+```sh
+curl -X GET \
+  'http://localhost:8081/iconmain/showImage?hash=QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR'
+```
+#### Response
+```json
+{
+    "ipfsHash": "QmTdejDU8ixgiTa4f986zziGWgYabBeeGHZrEsinFBxmWR",
+    "fileByte": "iVBORw0KG...",
+    "fileContentType": "image/png"
+}
+```
+
 
 > **`TODO`:**
-* Create RESTful API
 * Create generic Account Linked to Wallet

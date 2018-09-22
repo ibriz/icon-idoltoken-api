@@ -1,6 +1,7 @@
 package ibriz.icon.idoltoken.api
 
 import foundation.icon.icx.KeyWallet
+import grails.converters.JSON
 import ibiz.icon.idoltoken.api.IconConfiguration
 import ibiz.icon.idoltoken.api.Idol
 import io.ipfs.api.IPFS
@@ -9,7 +10,6 @@ import io.ipfs.api.NamedStreamable
 import io.ipfs.multihash.Multihash
 import org.apache.commons.codec.binary.Base64
 import org.grails.web.json.JSONObject
-import sun.misc.BASE64Encoder
 
 class IconmainController {
     static responseFormats = ['json']
@@ -27,10 +27,11 @@ class IconmainController {
     }
 
     def about() {
-        [
+        render([
                 icon_java_sdk: "0.9.7",
-                tbears       : "1.0.5.1"
-        ]
+                tbears       : "1.0.5.1",
+                developedBy  : "iBriz.ai"
+        ] as JSONObject)
     }
 
     def index(params) {
@@ -61,18 +62,25 @@ class IconmainController {
         String transferAmount = params.tokenAmount
         String tokenId = params?.tokenId
         KeyWallet currentWallet = IconConfiguration.getWalletByAddress(currentAddress)
-        def tokenBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress) // initial balance
+        def tokenBalance
         def transactionHash
+        def remainingBalance
+        def icxbalance
         def tokens = []
+        try {
+            tokenBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress) // initial balance
 
-        if (params.tokenType == 'IDOL') {
-            def approvalTransactionHash = iconmainService.approveTransaction(currentWallet, scoreAddress, toAddress, tokenId)
-            transactionHash = iconmainService.sendTransaction(currentWallet, scoreAddress, toAddress, tokenId)
-        } else
-            transactionHash = iconmainService.transfer(currentWallet, scoreAddress, currentWallet.getAddress(), toAddress, transferAmount)
-        def remainingBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress)
-        def icxbalance = iconmainService.balanceOfICX(currentAddress)
-
+            if (params.tokenType == 'IDOL') {
+                def approvalTransactionHash = iconmainService.approveTransaction(currentWallet, scoreAddress, toAddress, tokenId)
+                transactionHash = iconmainService.sendTransaction(currentWallet, scoreAddress, toAddress, tokenId)
+            } else
+                transactionHash = iconmainService.transfer(currentWallet, scoreAddress, currentWallet.getAddress(), toAddress, transferAmount)
+            remainingBalance = iconmainService.getTokenBalance(currentWallet, scoreAddress)
+            icxbalance = iconmainService.balanceOfICX(currentAddress)
+        } catch (Exception ex) {
+            ex.printStackTrace()
+            return render([error: "Couldn't transfer Idol Token. Error connecting to the blockchain."] as JSONObject)
+        }
         def response = [
                 address         : currentWallet.getAddress(),
                 toAddress       : toAddress,
@@ -102,10 +110,14 @@ class IconmainController {
         String age = params.age ? params.age : "0"
         String gender = params.gender ? params.gender : ""
         String ipfs_handle = params.ipfs_handle ? params.ipfs_handle : ""
-
-        def createTokenTransaction = iconmainService.createTokenTransaction(currentWallet, scoreAddress,
-                new Idol(fullname, age as BigInteger, gender, ipfs_handle))
-
+        def createTokenTransaction
+        try {
+            createTokenTransaction = iconmainService.createTokenTransaction(currentWallet, scoreAddress,
+                    new Idol(fullname, age as BigInteger, gender, ipfs_handle))
+        }catch (Exception ex){
+            ex.printStackTrace()
+            return render([error: "Couldn't create Idol Token. Error connecting to the blockchain."] as JSONObject)
+        }
         render(
                 [
                         address     : address,
@@ -125,7 +137,13 @@ class IconmainController {
         def currentAddress = params.address ? params.address : defaultAccountAddress
         String tokenType = params.tokenType ? params.tokenType : defaultToken
         String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
-        def icxbalance = iconmainService.balanceOfICX(currentAddress)
+        def icxbalance
+        try {
+            icxbalance = iconmainService.balanceOfICX(currentAddress)
+        } catch (Exception ex) {
+            ex.printStackTrace()
+            return render([error: "Couldn't get Account Information. Error connecting to the blockchain."] as JSONObject)
+        }
         def tokenBalance = null
         println "tokenBalance = " + IconConfiguration.listOfAccounts()
         def tokens = []
@@ -163,20 +181,27 @@ class IconmainController {
         String tokenId = params.tokenId ? params.tokenId : ""
         String tokenType = params.tokenType ? params.tokenType : defaultToken
         String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
-        def tokenInfo = iconmainService.getTokenInfo(currentAddress, scoreAddress, tokenId)
-        render(
-                [
-                        address     : tokenInfo.owner,
-                        tokenType   : tokenType,
-                        scoreAddress: scoreAddress,
-                        scoreMap    : scoreMap,
-                        name        : tokenInfo.name,
-                        age         : tokenInfo.age,
-                        gender      : tokenInfo.gender,
-                        price       : tokenInfo?.price,
-                        ipfs_handle : tokenInfo.ipfs_handle,
-                        tokenId     : params.tokenId
-                ] as JSONObject)
+
+        try {
+            def tokenInfo = iconmainService.getTokenInfo(currentAddress, scoreAddress, tokenId)
+            render(
+                    [
+                            address     : tokenInfo?.owner,
+                            name        : tokenInfo?.name,
+                            age         : tokenInfo?.age,
+                            gender      : tokenInfo?.gender,
+                            price       : tokenInfo?.price,
+                            ipfs_handle : tokenInfo?.ipfs_handle,
+                            tokenType   : tokenType,
+                            scoreAddress: scoreAddress,
+                            scoreMap    : scoreMap,
+                            tokenId     : params.tokenId
+                    ] as JSONObject)
+        } catch (Exception ex) {
+            ex.printStackTrace()
+            render([error: "Couldn't get Token information. Error connecting to the blockchain."] as JSONObject)
+        }
+
     }
 
     def uploadImage() {
@@ -201,11 +226,16 @@ class IconmainController {
     }
 
     def showImage(params) {
-        IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
-        Multihash filePointer = Multihash.fromBase58(params.hash);
-        byte[] fileContents = ipfs.cat(filePointer);
-        String encodedfile = new String(Base64.encodeBase64(fileContents), "UTF-8");
-        def response = [fileContentType: "image/png", fileByte: encodedfile, ipfsHash: params.hash]
-        render(response as JSONObject)
+        try {
+            IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/5001");
+            Multihash filePointer = Multihash.fromBase58(params.hash);
+            byte[] fileContents = ipfs.cat(filePointer);
+            String encodedfile = new String(Base64.encodeBase64(fileContents), "UTF-8");
+            def response = [fileContentType: "image/png", fileByte: encodedfile, ipfsHash: params.hash]
+            render(response as JSONObject)
+        } catch (Exception ex) {
+            ex.printStackTrace()
+            render([error: "Error getting image information."] as JSONObject)
+        }
     }
 }

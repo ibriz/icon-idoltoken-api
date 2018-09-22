@@ -197,14 +197,18 @@ class IconmainService {
     *
     * @result RpcItem (result)
     * */
-    def callInternalTransaction(_fromAddress, _scoreAddress, _method, _params){
-        Call<RpcItem> call = new Call.Builder()
-                .from(_fromAddress)
-                .to(_scoreAddress)
-                .method(_method)
-                .params(_params)
-                .build();
-        RpcItem result = iconService.call(call).execute();
-        result
+    def callInternalTransaction(_fromAddress, _scoreAddress, _method, _params) throws Exception{
+        try {
+            Call<RpcItem> call = new Call.Builder()
+                    .from(_fromAddress)
+                    .to(_scoreAddress)
+                    .method(_method)
+                    .params(_params)
+                    .build();
+            RpcItem result = iconService.call(call).execute();
+            result
+        }catch (Exception ex){
+            throw ex
+        }
     }
 }
