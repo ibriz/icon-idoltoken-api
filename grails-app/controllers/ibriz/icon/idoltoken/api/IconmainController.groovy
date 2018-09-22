@@ -9,6 +9,7 @@ import io.ipfs.api.NamedStreamable
 import io.ipfs.multihash.Multihash
 import org.apache.commons.codec.binary.Base64
 import org.grails.web.json.JSONObject
+import sun.misc.BASE64Encoder
 
 class IconmainController {
     static responseFormats = ['json']
@@ -25,6 +26,13 @@ class IconmainController {
         }
     }
 
+    def about() {
+        [
+                icon_java_sdk: "0.9.7",
+                tbears       : "1.0.5.1"
+        ]
+    }
+
     def index(params) {
         redirect(action: "checkAccountPage", params: params)
     }
@@ -36,7 +44,7 @@ class IconmainController {
         checkAccountPage(params)
         render([
                 address     : params.address,
-                tokenType   : 'MNT',
+                tokenType   : 'IDOL',
                 scoreMap    : scoreMap,
                 scoreAddress: scoreAddress
         ] as JSONObject)
@@ -44,24 +52,6 @@ class IconmainController {
 
     def scoreDetail(String tokenType) {
         return scoreMap.get(tokenType)
-    }
-
-    def transferToken() {
-        def currentAddress = params.address
-        def tokenType = params.tokenType
-
-        [
-                address  : currentAddress,
-                scoreMap : scoreMap,
-                tokenType: tokenType
-        ]
-    }
-
-    def transferIdolToken() {
-        def currentAddress = params.address
-        def tokenType = params.tokenType
-
-        [address: currentAddress, scoreMap: scoreMap, tokenType: tokenType]
     }
 
     def transfer(params) {
@@ -98,32 +88,9 @@ class IconmainController {
         render(response as JSONObject)
     }
 
-    def checkAccount() {
-        def currentAddress = params.address ? params.address : defaultAccountAddress
-        String tokenType = params.tokenType ? params.tokenType : defaultToken
-        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
-
-        [
-                address     : currentAddress,
-                scoreMap    : scoreMap,
-                tokenType   : tokenType,
-                scoreAddress: scoreAddress
-        ]
-    }
-
-    def createToken() {
-        def ownerAddress = params.address ? params.address : defaultAccountAddress
-        String tokenType = params.tokenType ? params.tokenType : defaultToken
-        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
-        [
-                address     : ownerAddress,
-                tokenType   : tokenType,
-                scoreAddress: scoreAddress,
-                scoreMap    : scoreMap
-        ]
-    }
-
     def createIdolToken(params) {
+        def requestMap = request.JSON as Map
+        params.putAll(requestMap)
 
         def address = params.address ? params.address : defaultAccountAddress
         String tokenType = params.tokenType ? params.tokenType : defaultToken
@@ -211,7 +178,6 @@ class IconmainController {
                         tokenId     : params.tokenId
                 ] as JSONObject)
     }
-
 
     def uploadImage() {
         def fileByte = request.getFile('image')

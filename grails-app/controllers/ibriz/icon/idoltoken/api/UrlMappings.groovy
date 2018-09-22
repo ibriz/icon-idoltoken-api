@@ -14,7 +14,7 @@ class UrlMappings {
                 // apply constraints here
             }
         }
-        "/"(controller: 'application', action:'index')
+        "/"(controller: 'iconmain', action:'about')
         "500"(view: '/error')
         "404"(view: '/notFound')
     }
