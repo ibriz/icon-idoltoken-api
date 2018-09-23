@@ -103,7 +103,7 @@ curl --request GET \
 ```
 
 ### 3.  Create new Token
-> http://localhost:8080/iconmain/createIdolToken?address=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&name=Jennifer%20Aniston&age=40&gender=F&ipfs_handle=0xsfalsdfjlk2
+> http://localhost:8080/iconmain/createIdolToken
 
 #### Parameters
 | Key | Value |
@@ -116,8 +116,17 @@ curl --request GET \
 
 #### Example Request
 ```sh
-curl --request GET \
-  --url 'http://localhost:8080/iconmain/createIdolToken?address=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&name="Jennifer Aniston"&age=40&gender=F&ipfs_handle=0xsfalsdfjlk2'
+curl -X POST \
+  http://localhost:8081/iconmain/createIdolToken \
+  -H 'Content-Type: application/json' \
+  -d '{
+"address":"hx65f6e18d378b57612a28f72acb97021eaa82aa5a",
+"tokenType":"IDOL",
+"name":"Michelle Sussett",
+"age":"22",
+"gender":"F",
+"ipfs_handle":"0xsfalsdfjlk29"
+}'
 ```
 
 #### Response
@@ -135,7 +144,7 @@ curl --request GET \
 ```
 
 ### 4.  Transfer token
-> http://localhost:8080/iconmain/transfer?fromAddress=hx65f6e18d378b57612a28f72acb97021eaa82aa5a&toAddress=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e
+> http://localhost:8080/iconmain/transfer
 
 #### Parameters
 | Key | Value |
@@ -147,8 +156,15 @@ curl --request GET \
 
 #### Example Request
 ```sh
-curl --request GET \
-  --url 'http://localhost:8080/iconmain/transfer?fromAddress=hx65f6e18d378b57612a28f72acb97021eaa82aa5a&toAddress=hx40ebd13225ed28f7e98be3cd833ebe555cba72ca&tokenType=IDOL&tokenId=0a55e0d0-af46-11e8-94b7-000c29be104e'
+curl -X POST \
+  http://localhost:8081/iconmain/transfer \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "fromAddress": "hx65f6e18d378b57612a28f72acb97021eaa82aa5a",
+    "toAddress": "hx40ebd13225ed28f7e98be3cd833ebe555cba72ca",
+    "tokenType": "IDOL",
+    "tokenId": "0a55e0d0-af46-11e8-94b7-000c29be104e"
+}'
  ```
 
 #### Response

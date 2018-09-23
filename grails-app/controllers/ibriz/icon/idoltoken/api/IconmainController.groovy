@@ -56,6 +56,9 @@ class IconmainController {
     }
 
     def transfer(params) {
+        def requestMap = request.JSON as Map
+        params.putAll(requestMap)
+
         def currentAddress = params.fromAddress
         def scoreAddress = scoreMap.getOrDefault(params.tokenType, defaultSCORE)
         def toAddress = params.toAddress
