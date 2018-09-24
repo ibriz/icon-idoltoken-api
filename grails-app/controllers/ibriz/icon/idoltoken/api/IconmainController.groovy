@@ -49,6 +49,7 @@ class IconmainController {
         params.putAll(requestMap)
 
         def currentAddress = params.fromAddress
+        String tokenType = params.tokenType ? params.tokenType : defaultToken
         def scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
         def toAddress = params.toAddress
         String transferAmount = params.tokenAmount
