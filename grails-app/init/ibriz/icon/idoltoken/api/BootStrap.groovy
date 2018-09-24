@@ -21,7 +21,8 @@ class BootStrap {
             KeyWallet currentWallet = walletMap['wallet'] as KeyWallet
             IconConfiguration.putAddress(walletAddress, currentWallet)
         }
-
+        def env = System.getenv()
+        IconConfiguration.setScoreMap(env['SCORE'])
         iconmainService.load()
     }
     def destroy = {

@@ -20,12 +20,6 @@ class IconmainController {
     def defaultSCORE = "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0"
     def defaultToken = "IDOL"
 
-    Map<String, String> scoreMap = new HashMap<String, String>() {
-        {
-            put("IDOL", "cx2786071ed73dd62de1a2ef5e514f7253cd8389af")
-        }
-    }
-
     def about() {
         render([
                 icon_java_sdk: "0.9.7",
@@ -40,19 +34,14 @@ class IconmainController {
 
     def myWallet(params) {
         params.address = defaultAccountAddress
-        String scoreAddress = scoreMap.getOrDefault(params.tokenType, defaultSCORE)
+        String scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
 
         checkAccountPage(params)
         render([
                 address     : params.address,
                 tokenType   : 'IDOL',
-                scoreMap    : scoreMap,
                 scoreAddress: scoreAddress
         ] as JSONObject)
-    }
-
-    def scoreDetail(String tokenType) {
-        return scoreMap.get(tokenType)
     }
 
     def transfer(params) {
@@ -60,7 +49,7 @@ class IconmainController {
         params.putAll(requestMap)
 
         def currentAddress = params.fromAddress
-        def scoreAddress = scoreMap.getOrDefault(params.tokenType, defaultSCORE)
+        def scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
         def toAddress = params.toAddress
         String transferAmount = params.tokenAmount
         String tokenId = params?.tokenId
@@ -105,7 +94,7 @@ class IconmainController {
 
         def address = params.address ? params.address : defaultAccountAddress
         String tokenType = params.tokenType ? params.tokenType : defaultToken
-        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
+        String scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
 
         KeyWallet currentWallet = IconConfiguration.getWalletByAddress(address)
 
@@ -139,7 +128,7 @@ class IconmainController {
     def checkAccountPage(params) {
         def currentAddress = params.address ? params.address : defaultAccountAddress
         String tokenType = params.tokenType ? params.tokenType : defaultToken
-        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
+        String scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
         def icxbalance
         try {
             icxbalance = iconmainService.balanceOfICX(currentAddress)
@@ -172,7 +161,6 @@ class IconmainController {
                 tokenBalance: tokenBalance,
                 ICXbalance  : icxbalance,
                 scoreAddress: scoreAddress,
-                scoreMap    : scoreMap,
                 tokenList   : tokens,
                 accountList : IconConfiguration.listOfAccounts()
         ]
@@ -183,7 +171,7 @@ class IconmainController {
         String currentAddress = params.address ? params.address : defaultAccountAddress
         String tokenId = params.tokenId ? params.tokenId : ""
         String tokenType = params.tokenType ? params.tokenType : defaultToken
-        String scoreAddress = scoreMap.getOrDefault(tokenType, defaultSCORE)
+        String scoreAddress = IconConfiguration.getScoreMap(tokenType, defaultSCORE)
 
         try {
             def tokenInfo = iconmainService.getTokenInfo(currentAddress, scoreAddress, tokenId)
@@ -197,7 +185,6 @@ class IconmainController {
                             ipfs_handle : tokenInfo?.ipfs_handle,
                             tokenType   : tokenType,
                             scoreAddress: scoreAddress,
-                            scoreMap    : scoreMap,
                             tokenId     : params.tokenId
                     ] as JSONObject)
         } catch (Exception ex) {
