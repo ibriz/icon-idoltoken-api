@@ -138,7 +138,6 @@ class IconmainController {
             return render([error: "Couldn't get Account Information. Error connecting to the blockchain."] as JSONObject)
         }
         def tokenBalance = null
-        println "tokenBalance = " + IconConfiguration.listOfAccounts()
         def tokens = []
         try {
             KeyWallet currentWallet = IconConfiguration.getWalletByAddress(currentAddress)
@@ -207,7 +206,6 @@ class IconmainController {
             MerkleNode addResult = ipfs.add(file).get(0);
 
             def result = addResult.toJSON();
-            print("result: : " + result)
 
             render([ipfsHash: result["Hash"], "name": result["Name"], "size": result["Size"]] as JSONObject)
         } catch (Exception e) {

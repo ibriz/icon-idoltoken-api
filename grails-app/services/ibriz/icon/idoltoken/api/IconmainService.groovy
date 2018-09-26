@@ -117,7 +117,7 @@ class IconmainService {
             }
         }
 
-        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString())
+//        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString())
         jsonObj
     }
 

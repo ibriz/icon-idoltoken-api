@@ -23,6 +23,7 @@ class BootStrap {
         }
         def env = System.getenv()
         IconConfiguration.setScoreMap(env['SCORE'])
+        println "SCORE = " + env['SCORE']
         iconmainService.load()
     }
     def destroy = {
