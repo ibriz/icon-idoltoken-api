@@ -4,6 +4,7 @@ import foundation.icon.icx.*
 import foundation.icon.icx.data.Address
 import foundation.icon.icx.data.Bytes
 import foundation.icon.icx.transport.http.HttpProvider
+import foundation.icon.icx.transport.jsonrpc.RpcArray
 import foundation.icon.icx.transport.jsonrpc.RpcItem
 import foundation.icon.icx.transport.jsonrpc.RpcObject
 import foundation.icon.icx.transport.jsonrpc.RpcValue
@@ -11,7 +12,6 @@ import ibiz.icon.idoltoken.api.IconConfiguration
 import ibiz.icon.idoltoken.api.Idol
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 class IconmainService {
@@ -48,7 +48,7 @@ class IconmainService {
                 .put("_owner", new RpcValue(currentAddress))
                 .build();
 
-        RpcItem result = callInternalTransaction(currentAddress, new Address(scoreAddressStr), "balanceOf", params)
+        RpcValue result = callInternalTransaction(currentAddress, new Address(scoreAddressStr), "balanceOf", params)
         result.asInteger()
     }
 
@@ -59,7 +59,7 @@ class IconmainService {
                 .put("_owner", new RpcValue(currentAddress))
                 .build();
 
-        RpcItem result = callInternalTransaction(currentAddress, new Address(scoreAddressStr), "balanceOf", params)
+        RpcValue result = callInternalTransaction(currentAddress, new Address(scoreAddressStr), "balanceOf", params)
         result.asInteger()
     }
 
@@ -75,15 +75,14 @@ class IconmainService {
                 .put("_owner", new RpcValue(currentAddress))
                 .build();
 
-        RpcItem result = callInternalTransaction(currentAddress, new Address(scoreAddressStr),"get_tokens_of_owner", params )
-        System.out.println(currentAddress.toString() + " :result:" + result.asString());
+        RpcObject result = callInternalTransaction(currentAddress, new Address(scoreAddressStr),"get_tokens_of_owner", params )
 
         def tokenList = []
-        JSONObject obj = new JSONObject(result.asString());
-        JSONArray idolTokensOfOwner = obj.getJSONArray("idols");
+        RpcArray idolTokensOfOwner = result.getItem("idols").asArray()
+
         int index = 0;
-        for (Object idolToken : idolTokensOfOwner) {
-            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.toString(), index).put("tokenId", idolToken.toString()))
+        for (RpcItem idolToken : idolTokensOfOwner) {
+            tokenList.add(getTokenInfo(address, scoreAddressStr, idolToken.asString(), index).put("tokenId", idolToken.asString()))
             index = index + 1;
         }
         tokenList
@@ -102,23 +101,27 @@ class IconmainService {
 
         RpcItem result = callInternalTransaction(firstAddress, new Address(scoreAddressStr), "get_idol", params)
 
-        def jsonObj = new JSONObject(result.asString())
+        RpcObject jsonObj = result.asObject()
+
         def price = tokenidPriceMap.containsKey(tokenId) ? tokenidPriceMap.get(tokenId) : priceList.get(index)
         if (!tokenidPriceMap.containsKey(tokenId)) {
             tokenidPriceMap.put(tokenId, priceList.get(index))
         }
+        JSONObject resultJson = new JSONObject()
+        for (String key : jsonObj.keySet()) {
+            resultJson.put(key, jsonObj.getItem(key))
+        }
 
-        jsonObj = jsonObj.accumulate("price", price)
-        if (jsonObj.get("age") != null) {
-            if (jsonObj.get("age").toString().startsWith('0x')) {
-                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString().substring(2), 16))
+        resultJson = resultJson.put("price", price)
+        if (null!=jsonObj.getItem("age") ) {
+            if (jsonObj.getItem("age").toString().startsWith('0x')) {
+                resultJson.put("age", Integer.parseInt(jsonObj.getItem("age").toString().substring(2), 16))
             } else {
-                jsonObj.put("age", Integer.parseInt(jsonObj.get("age").toString()))
+                resultJson.put("age", Integer.parseInt(jsonObj.getItem("age").toString()))
             }
         }
 
-//        System.out.println("index: " + index + " - " + firstAddress.toString() + " :result:" + jsonObj.toString())
-        jsonObj
+        resultJson
     }
 
     def getTokenInfo(KeyWallet currentWallet, String scoreAddressStr, String tokenId) throws IOException {
@@ -205,7 +208,7 @@ class IconmainService {
                     .method(_method)
                     .params(_params)
                     .build();
-            RpcItem result = iconService.call(call).execute();
+            Object result = iconService.call(call).execute();
             result
         }catch (Exception ex){
             throw ex
