@@ -28,6 +28,23 @@ class IconmainController {
         ] as JSONObject)
     }
 
+    def error() {
+        log.error("Internal Server Error: " + request.forwardURI)
+        render(
+                [
+                        error: "Internal Server Error.",
+                ] as JSONObject
+        )
+    }
+
+    def notFound() {
+        log.error("Endpoint not found: " )
+        log.error(request.forwardURI + " params: " +request.params)
+        render([
+                error: "The endpoint not found"
+        ] as JSONObject)
+    }
+
     def index(params) {
         redirect(action: "checkAccountPage", params: params)
     }

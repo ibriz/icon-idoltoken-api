@@ -15,7 +15,7 @@ class UrlMappings {
             }
         }
         "/"(controller: 'iconmain', action:'about')
-        "500"(view: '/error')
-        "404"(view: '/notFound')
+        "500"(controller: 'iconmain', action:'error')
+        "404"(controller: 'iconmain', action:'notFound')
     }
 }
