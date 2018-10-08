@@ -16,7 +16,7 @@ class IconmainController {
 
     def iconmainService
 
-    def defaultAccountAddress = "hx65f6e18d378b57612a28f72acb97021eaa82aa5a"
+    def defaultAccountAddress = "hxe9d75191906ccc604fc1e45a9f3c59fb856c215f"
     def defaultSCORE = "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0"
     def defaultToken = "IDOL"
 

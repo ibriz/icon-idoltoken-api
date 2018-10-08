@@ -78,7 +78,7 @@ class IconmainService {
         RpcObject result = callInternalTransaction(currentAddress, new Address(scoreAddressStr),"get_tokens_of_owner", params )
 
         def tokenList = []
-        RpcArray idolTokensOfOwner = result.getItem("idols").asArray()
+        RpcArray idolTokensOfOwner = result?.getItem("idols")?.asArray()
 
         int index = 0;
         for (RpcItem idolToken : idolTokensOfOwner) {

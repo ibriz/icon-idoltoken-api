@@ -17,7 +17,7 @@ class WalletOperations {
         File file = new File(filename);
         try {
             System.out.println("before loading wallet");
-            wallet = KeyWallet.load("password", file);
+            wallet = KeyWallet.load("p@ssword1", file);
             System.out.println("after loading wallet" + wallet.getAddress());
             return [address: wallet.getAddress(), wallet: wallet]
         } catch (IOException e) {

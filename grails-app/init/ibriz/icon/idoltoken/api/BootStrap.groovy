@@ -10,9 +10,9 @@ class BootStrap {
 
         Map<String, String> accountKeystore = new HashMap<String, String>() {
             {
-                put("hx65f6e18d378b57612a28f72acb97021eaa82aa5a", "walletkeys" + File.separator + "UTC--2018-08-24T13-35-41.671000000Z--hx65f6e18d378b57612a28f72acb97021eaa82aa5a.json")
-                put("hx40ebd13225ed28f7e98be3cd833ebe555cba72ca", "walletkeys" + File.separator + "UTC--2018-08-24T13-38-56.387000000Z--hx40ebd13225ed28f7e98be3cd833ebe555cba72ca.json")
-                put("hx2a7c46497d99e64d7198c267b5ca7deca265a4f8", "walletkeys" + File.separator + "UTC--2018-09-01T12-30-01.728000000Z--hx2a7c46497d99e64d7198c267b5ca7deca265a4f8.json")
+                put("hxe9d75191906ccc604fc1e45a9f3c59fb856c215f", "walletkeys" + File.separator + "keystore1.json")
+                put("hx266b582598ee78a12825831ac76200520c3a187d", "walletkeys" + File.separator + "keystore2.json")
+                put("hxda845aaf0c5829037324c8bbddc8da19ba026d03", "walletkeys" + File.separator + "keystore3.json")
             }
         }
         for (Map.Entry<String, String> accountKey : accountKeystore.entrySet()) {
