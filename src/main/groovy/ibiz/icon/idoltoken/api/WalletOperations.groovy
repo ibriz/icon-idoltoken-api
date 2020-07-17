@@ -2,10 +2,6 @@ package ibiz.icon.idoltoken.api
 
 import foundation.icon.icx.KeyWallet
 import foundation.icon.icx.Wallet
-import org.web3j.crypto.CipherException
-
-import org.apache.commons.codec.binary.Base64;
-import java.util.Arrays;
 
 class WalletOperations {
     public static loadWalletFromPrivateKey(String privateKey) {
@@ -21,8 +17,6 @@ class WalletOperations {
             System.out.println("after loading wallet" + wallet.getAddress());
             return [address: wallet.getAddress(), wallet: wallet]
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CipherException e) {
             e.printStackTrace();
         }
         []
