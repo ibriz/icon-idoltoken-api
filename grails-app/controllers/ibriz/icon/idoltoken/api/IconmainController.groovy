@@ -16,8 +16,8 @@ class IconmainController {
 
     def iconmainService
 
-    def defaultAccountAddress = "hxe9d75191906ccc604fc1e45a9f3c59fb856c215f"
-    def defaultSCORE = "cx92b9ca3965c4f44f265a35f31498ddb9821ea5a0"
+    def defaultAccountAddress = "hxaad0d6e403a9f62bcdbe4479a241786c1c346d3c"
+    def defaultSCORE="cx93af6ebd0814bb6eddf662c2ea43a3138271e559"
     def defaultToken = "IDOL"
 
     def about() {
@@ -32,7 +32,7 @@ class IconmainController {
         log.error("Internal Server Error: " + request.forwardURI)
         render(
                 [
-                        error: "Internal Server Error.",
+                        error: "Internal Server Error."+request.forwardURI,
                 ] as JSONObject
         )
     }
@@ -213,7 +213,6 @@ class IconmainController {
 
     def uploadImage() {
         def fileByte = request.getFile('image')
-
 
         try {
             byte[] bytes = fileByte.getBytes();

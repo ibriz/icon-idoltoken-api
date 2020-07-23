@@ -10,9 +10,9 @@ class BootStrap {
 
         Map<String, String> accountKeystore = new HashMap<String, String>() {
             {
-                put("hxe9d75191906ccc604fc1e45a9f3c59fb856c215f", "walletkeys" + File.separator + "keystore1.json")
-                put("hx266b582598ee78a12825831ac76200520c3a187d", "walletkeys" + File.separator + "keystore2.json")
-                put("hxda845aaf0c5829037324c8bbddc8da19ba026d03", "walletkeys" + File.separator + "keystore3.json")
+                put("hxaad0d6e403a9f62bcdbe4479a241786c1c346d3c", "walletkeys" + File.separator + "keystore1.json")
+                put("hx829238bc4d7100ca918b2c9c3768edc97de1d375", "walletkeys" + File.separator + "keystore2.json")
+                put("hx345bebadc9537481e445a721f5618acf0b4a3b2d", "walletkeys" + File.separator + "keystore3.json")
             }
         }
         for (Map.Entry<String, String> accountKey : accountKeystore.entrySet()) {
@@ -21,9 +21,10 @@ class BootStrap {
             KeyWallet currentWallet = walletMap['wallet'] as KeyWallet
             IconConfiguration.putAddress(walletAddress, currentWallet)
         }
-        def env = System.getenv()
-        IconConfiguration.setScoreMap(env['SCORE'])
-        println "SCORE = " + env['SCORE']
+//        def env = System.getenv()
+//        IconConfiguration.setScoreMap(env['SCORE'])
+//        println "SCORE = " + env['SCORE']
+        IconConfiguration.setScoreMap("cx93af6ebd0814bb6eddf662c2ea43a3138271e559")
         iconmainService.load()
     }
     def destroy = {

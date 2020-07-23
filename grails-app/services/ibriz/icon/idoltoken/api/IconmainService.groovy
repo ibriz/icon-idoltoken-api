@@ -20,17 +20,18 @@ class IconmainService {
     static def tokenidPriceMap = [:]
 
 
-    def iconService;
+    def  iconService;
 
     def load() {
-        final String URL = "http://localhost:9000/api/v3";
+        final String LocalhostURL = "http://127.0.0.1:9000";
+        final String TestnetURL = "https://bicon.net.solidwallet.io"
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build();
-        iconService = new IconService(new HttpProvider(httpClient, URL as String));
+         iconService = new IconService(new HttpProvider( httpClient,TestnetURL as String,3));
     }
 
     def transfer(KeyWallet wallet, scoreAddress, fromAddress, toAddress, value) {
